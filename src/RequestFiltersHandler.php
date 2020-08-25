@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use OnzaMe\Helpers\Contracts\RequestFiltersContract;
 use OnzaMe\Helpers\Exceptions\UnproccessableHttpRequestException;
-use OnzaMe\Helpers\Services\RequestOrderHandler;
 
 class RequestFiltersHandler implements RequestFiltersContract
 {
