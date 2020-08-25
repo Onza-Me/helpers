@@ -1,0 +1,63 @@
+{
+    "name": "onza-me/helpers",
+    "description": "Laravel helpers.",
+    "keywords": [
+        "onza-me",
+        "domda_backend_laravel_package_template"
+    ],
+    "homepage": "https://github.com/onza-me/domda_backend_laravel_package_template",
+    "license": "The Unlicense",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Yurij Karpov",
+            "email": "acrossoffwest@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "onza-me/backend_jwt": "dev-master",
+        "illuminate/support": "^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:Onza-Me/backend_jwt.git"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "OnzaMe\\Helpers\\": "src"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OnzaMe\\Helpers\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+              "HelpersServiceProvider"
+            ],
+            "aliases": {
+                "Helpers": "HelpersFacade"
+            }
+        }
+    }
+}
