@@ -47,7 +47,7 @@ class RequestFiltersHandler implements RequestFiltersContract
      * @param string $method
      * @return $this|mixed
      */
-    public function addFilter($key, $value = null, string $operator = '=', string $method = 'where', string $fieldType = null)
+    public function addFilter($key, $value = null, string $operator = '=',string $method = 'where', string $fieldType = null)
     {
         if ($method === 'where' && is_a($key, \Closure::class)) {
             $this->filters[] = $key;

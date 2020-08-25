@@ -1,10 +1,10 @@
 <?php
 
-namespace OnzaMe\Helpers\Services;
+namespace OnzaMe\Helpers;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
-use OnzaMe\Helpers\Services\Contracts\RequestOrderContract;
+use OnzaMe\Helpers\Contracts\RequestOrderContract;
 use OnzaMe\Helpers\Exceptions\UnproccessableHttpRequestException;
 
 class RequestOrderHandler implements RequestOrderContract
