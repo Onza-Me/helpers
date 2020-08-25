@@ -2,24 +2,16 @@
 
 namespace OnzaMe\Helpers;
 
-use OnzaMe\Helpers\Exceptions\UnproccessableHttpRequestException;
-use OnzaMe\Helpers\Services\Contracts\RequestFiltersContract;
-use OnzaMe\Helpers\Services\Dadata\DadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\AreaDadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\CityDadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\CityDistrictDadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\HouseDadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\RegionDadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\SettlementDadataService;
-use OnzaMe\Helpers\Services\Dadata\Location\StreetDadataService;
-use OnzaMe\Helpers\Services\FormScheme\OfferFormSchemeService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
+use OnzaMe\Helpers\Contracts\RequestFiltersContract;
+use OnzaMe\Helpers\Exceptions\UnproccessableHttpRequestException;
+use OnzaMe\Helpers\Services\RequestOrderHandler;
 
 class RequestFiltersHandler implements RequestFiltersContract
 {
-    private Request $request;
-    private array $filters = [];
+    protected Request $request;
+    protected array $filters = [];
 
     public function __construct(Request $request)
     {
@@ -27,7 +19,7 @@ class RequestFiltersHandler implements RequestFiltersContract
         $this->extractFilters($request);
     }
 
-    private function extractFilters(Request $request)
+    protected function extractFilters(Request $request)
     {
         $filters = $request->get('filter') ?? [];
 
@@ -48,48 +40,22 @@ class RequestFiltersHandler implements RequestFiltersContract
         }
     }
 
-    public function getAddressFilters(string $address = null): array
+    /**
+     * @param \Closure|string $key
+     * @param null $value
+     * @param string $operator
+     * @param string $method
+     * @return $this|mixed
+     */
+    public function addFilter($key, $value = null, string $operator = '=', string $method = 'where', string $fieldType = null)
     {
-        if (empty(trim($address))) {
-            return [];
-        }
-        $data = [];
-        $dadata = app(DadataService::class);
-        $addressInfo = null;
-        try {
-            $addressInfo = $dadata->getAddressInfo($address);
-        } catch (\Exception $e) {
-            return [];
-        }
-
-        $data['house_number'] = $addressInfo->getHouseNumber(null);
-        $data['region_id'] = app(RegionDadataService::class)->createOrFind($addressInfo)->id;
-        $data['city_id'] = app(CityDadataService::class)->createOrFind($addressInfo)->id;
-        $data['city_district_id'] = app(CityDistrictDadataService::class)->createOrFind($addressInfo)->id;
-        $data['area_id'] = app(AreaDadataService::class)->createOrFind($addressInfo)->id;
-        $data['settlement_id'] = app(SettlementDadataService::class)->createOrFind($addressInfo)->id;
-        $data['house_id'] = app(HouseDadataService::class)->createOrFind($addressInfo)->id;
-        $data['street_id'] = app(StreetDadataService::class)->createOrFind($addressInfo)->id;
-
-        return array_filter($data, function ($addressItem) {
-            return !empty($addressItem);
-        });
-    }
-
-    public function addFilter($key, $value = null, string $operator = '=', string $method = 'where')
-    {
-        if ($key === 'address') {
-            $addressFilters = $this->getAddressFilters($value);
-            foreach ($addressFilters as $key => $value) {
-                $this->addFilter($key, $value);
-            }
-            return $this;
-        }
         if ($method === 'where' && is_a($key, \Closure::class)) {
             $this->filters[] = $key;
+            return $this;
         }
         $this->filters[] = [
             'key' => $key,
+            'field_type' => $fieldType,
             'value' => $value,
             'operator' => $operator,
             'method' => $method
@@ -104,40 +70,37 @@ class RequestFiltersHandler implements RequestFiltersContract
      */
     public function apply($builder)
     {
-        $offerSchemeService = app(OfferFormSchemeService::class);
+
         foreach ($this->filters as $filter) {
-            if (is_array($filter)) {
-                $field = $offerSchemeService->findFieldByKey($filter['key']);
-                $existsType = !empty($field) && isset($field['type']);
-                $isJson = $existsType && $field['type'] === 'json';
-                $isMultipleRadio = $existsType && $field['type'] === 'radio' && isset($field['multiple']) && $field['multiple'];
-                if ($isJson || $isMultipleRadio) {
-                    /** @var Builder $builder */
-                    $builder = $builder->where(function (Builder $builder) use ($filter) {
-                        if (is_array($filter['value'])) {
-                            $builder->whereJsonContains($filter['key'], $filter['value'][0]);
-                            foreach ($filter['value'] as $index => $value) {
-                                if ($index === 0) {
-                                    continue;
-                                }
-                                $builder->orWhereJsonContains($filter['key'], $value);
-                            }
-                        } else {
-                            $builder->whereJsonContains($filter['key'], $filter['value']);
-                        }
-                    });
-                    continue;
-                }
-                if ($filter['method'] === 'whereNotIn') {
-                    $builder = $builder->{$filter['method']}($filter['key'], $filter['value']);
-                } else if (is_array($filter['value'])) {
-                    $builder = $builder->whereIn($filter['key'], $filter['value']);
-                } else {
-                    $builder = $builder->{$filter['method']}($filter['key'], $filter['operator'], $filter['value']);
-                }
+            if (is_callable($filter)) {
+                $builder = $filter($builder);
                 continue;
             }
-            $builder = $filter($builder);
+
+            if (isset($filter['type']) && $filter['type'] === 'json') {
+                /** @var Builder $builder */
+                $builder = $builder->where(function (Builder $builder) use ($filter) {
+                    if (is_array($filter['value'])) {
+                        $builder->whereJsonContains($filter['key'], $filter['value'][0]);
+                        foreach ($filter['value'] as $index => $value) {
+                            if ($index === 0) {
+                                continue;
+                            }
+                            $builder->orWhereJsonContains($filter['key'], $value);
+                        }
+                    } else {
+                        $builder->whereJsonContains($filter['key'], $filter['value']);
+                    }
+                });
+                continue;
+            }
+            if ($filter['method'] === 'whereNotIn') {
+                $builder = $builder->{$filter['method']}($filter['key'], $filter['value']);
+            } else if (is_array($filter['value'])) {
+                $builder = $builder->whereIn($filter['key'], $filter['value']);
+            } else {
+                $builder = $builder->{$filter['method']}($filter['key'], $filter['operator'], $filter['value']);
+            }
         }
 
         return $builder;

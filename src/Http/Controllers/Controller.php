@@ -2,6 +2,7 @@
 
 namespace OnzaMe\Helpers\Http\Controllers;
 
+use OnzaMe\Helpers\Contracts\RequestFiltersContract;
 use OnzaMe\Helpers\RequestFiltersHandler;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -13,7 +14,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function getCollectionResponse($request, string $collectionResourceClass, Builder $query, RequestFiltersHandler $filterHandler = null)
+    public function getCollectionResponse($request, string $collectionResourceClass, Builder $query, RequestFiltersContract $filterHandler = null)
     {
         $filterHandler = $filterHandler ?? new RequestFiltersHandler($request);
 
