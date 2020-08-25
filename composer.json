@@ -49,15 +49,5 @@
     },
     "config": {
         "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-              "HelpersServiceProvider"
-            ],
-            "aliases": {
-                "Helpers": "HelpersFacade"
-            }
-        }
     }
 }
