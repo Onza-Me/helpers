@@ -76,7 +76,7 @@ class RequestFiltersHandler implements RequestFiltersContract
                 continue;
             }
 
-            if (isset($filter['type']) && $filter['type'] === 'json') {
+            if (isset($filter['field_type']) && $filter['field_type'] === 'json') {
                 /** @var Builder $builder */
                 $builder = $builder->where(function (Builder $builder) use ($filter) {
                     if (is_array($filter['value'])) {
