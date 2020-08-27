@@ -20,7 +20,7 @@ class RequestOrderHandler implements RequestOrderContract
 
     public function extractOrders(Request $request)
     {
-        $orders = $request->get('order') ?? [];
+        $orders = get_converted_json_from_request($request, 'order');
 
         foreach ($orders as $key => $ordering) {
             $this->addOrder($key, $ordering);

@@ -20,7 +20,7 @@ class RequestFiltersHandler implements RequestFiltersContract
 
     protected function extractFilters(Request $request)
     {
-        $filters = $request->get('filter') ?? [];
+        $filters = get_converted_json_from_request($request, 'filter');
 
         foreach ($filters as $key => $filter) {
             if (is_numeric($key)) {
