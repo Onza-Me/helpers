@@ -16,7 +16,7 @@ if (!function_exists('get_converted_json_from_request')) {
         }
 
         try {
-            return json_decode($json);
+            return json_decode($json, true);
         } catch (\Exception $ex) {
             return $json;
         }
