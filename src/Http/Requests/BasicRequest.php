@@ -3,7 +3,9 @@
 namespace OnzaMe\Helpers\Http\Requests;
 
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class BasicRequest extends FormRequest
 {
@@ -33,5 +35,18 @@ class BasicRequest extends FormRequest
             ->where('id', $id)
             ->where('user_id', $this->getUserId())
             ->exists();
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'error' => [
+                "message" => [
+                    "title" => "Данные не прошли проверку",
+                    "description" => "Введите корректные данные"
+                ],
+                "fields" => $validator->errors()
+            ]
+        ], 422));
     }
 }
