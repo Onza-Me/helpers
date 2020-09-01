@@ -14,7 +14,15 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function getCollectionResponse($request, string $collectionResourceClass, Builder $query, RequestFiltersContract $filterHandler = null)
+    /**
+     * @param $request
+     * @param string $collectionResourceClass
+     * @param Builder $query
+     * @param RequestFiltersContract|null $filterHandler
+     * @return \Illuminate\Http\JsonResponse|mixed
+     * @throws \OnzaMe\Helpers\Exceptions\UnproccessableHttpRequestException
+     */
+    public function getCollectionResponse($request, string $collectionResourceClass, $query, RequestFiltersContract $filterHandler = null)
     {
         $filterHandler = $filterHandler ?? new RequestFiltersHandler($request);
 
