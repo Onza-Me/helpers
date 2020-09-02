@@ -9,7 +9,6 @@ class HttpRequestException extends Exception
 {
     protected  ErrorResponse $response;
 
-
     public function __construct(string $title = 'Ошибка', string $description = 'Не предвиденная ошибка', array $fields = [], int $status = 500)
     {
         $this->response = new ErrorResponse($title, $description, $fields, $status);
@@ -20,5 +19,10 @@ class HttpRequestException extends Exception
     public function getResponse()
     {
         return $this->response;
+    }
+
+    public function addField($key, $value)
+    {
+        $this->response->addField($key, $value);
     }
 }
