@@ -21,19 +21,23 @@ class ErrorResponse extends \Illuminate\Http\JsonResponse
 
     public function addField($key, $value)
     {
-        $data = $this->getData();
+        $data = $this->getData(true);
 
-        if(isset($data['fields']))
-            $data['fields'][$key][] = $value;
-        else {
-            $data['fields'][$key] = [];
-            $data['fields'][$key][] = $value;
+        if (!isset($data['fields'])) {
+            $data['fields'] = [];
         }
+        if (!isset($data['fields'][$key])) {
+            $data['fields'][$key] = [];
+        }
+
+        $data['fields'][$key][] = $value;
+
+        $this->setData($data);
     }
 
     public function exists()
     {
-        $data = $this->getData();
+        $data = $this->getData(true);
 
         return count($data['fields']);
     }
