@@ -17,9 +17,10 @@
     ],
     "require": {
         "php": "^7.4",
-        "onza-me/backend_jwt": "dev-master",
+        "ext-json": "*",
         "illuminate/support": "^7.0",
-        "ext-json": "*"
+        "onza-me/backend_jwt": "dev-master",
+        "sentry/sentry-laravel": "^1.9"
     },
     "require-dev": {
         "orchestra/testbench": "^5.0",
