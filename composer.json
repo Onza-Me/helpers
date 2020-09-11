@@ -6,7 +6,7 @@
         "domda_backend_laravel_package_template"
     ],
     "homepage": "https://github.com/onza-me/domda_backend_laravel_package_template",
-    "license": "The Unlicense",
+    "license": "proprietary",
     "type": "library",
     "authors": [
         {
