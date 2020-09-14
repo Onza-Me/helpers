@@ -2,6 +2,7 @@
 
 namespace OnzaMe\Helpers\Http\Resources;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -31,11 +32,15 @@ class BaseCollection extends ResourceCollection
                 "next_page_url" => $paginate->nextPageUrl(),
                 "prev_page_url" => $paginate->previousPageUrl(),
                 "path" => $paginate->getOptions()['path'],
-                "data" => $this->collection->map(function ($item) {
+                "data" => $this->collection->map(function ($item) use ($request) {
                     if (!$this->collects()) {
+                        if (is_a($item, JsonResource::class) || is_a($item, ResourceCollection::class)) {
+                            return $item->toArray($request);
+                        }
                         return $item->toArray();
                     }
-                    return new $this->collects($item);
+                    $collectsClass = $this->collects();
+                    return new $collectsClass($item);
                 })
             ];
         } catch (\Exception $ex) {
