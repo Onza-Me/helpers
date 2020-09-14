@@ -32,7 +32,7 @@ class BaseCollection extends ResourceCollection
                 "prev_page_url" => $paginate->previousPageUrl(),
                 "path" => $paginate->getOptions()['path'],
                 "data" => $this->collection->map(function ($item) {
-                    if (!$this->collects) {
+                    if (!$this->collects()) {
                         return $item->toArray();
                     }
                     return new $this->collects($item);
