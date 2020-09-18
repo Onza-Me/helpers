@@ -7,6 +7,18 @@ if (!function_exists('array_mapper')) {
     }
 }
 
+if (!function_exists('is_json')) {
+    function is_json (string $json): bool
+    {
+        try {
+            json_decode($json);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+}
+
 if (!function_exists('get_converted_json_from_request')) {
     function get_converted_json_from_request (\Illuminate\Http\Request $request, string $key)
     {

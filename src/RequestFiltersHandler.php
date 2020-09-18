@@ -4,6 +4,7 @@ namespace OnzaMe\Helpers;
 
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 use OnzaMe\Helpers\Contracts\RequestFiltersContract;
 use OnzaMe\Helpers\Exceptions\UnproccessableHttpRequestException;
 
@@ -27,13 +28,19 @@ class RequestFiltersHandler implements RequestFiltersContract
                 $this->addFilter(
                     $filter['key'],
                     $filter['value'],
-                    $filter['operator'] ?? '='
+                    $filter['operator'] ?? '=',
+                    $filter['method'] ?? null,
+                    null,
+                    $filter['is_or'] ?? null,
                 );
             } else {
                 $this->addFilter(
                     $key,
                     $filter['value'],
-                    $filter['operator'] ?? '='
+                    $filter['operator'] ?? '=',
+                    $filter['method'] ?? null,
+                    null,
+                    $filter['is_or'] ?? null,
                 );
             }
         }
@@ -44,9 +51,11 @@ class RequestFiltersHandler implements RequestFiltersContract
      * @param null $value
      * @param string $operator
      * @param string $method
+     * @param string|null $fieldType
+     * @param bool $isOr
      * @return $this|mixed
      */
-    public function addFilter($key, $value = null, string $operator = '=',string $method = 'where', string $fieldType = null)
+    public function addFilter($key, $value = null, string $operator = '=', string $method = 'where', string $fieldType = null, bool $isOr = false)
     {
         if ($method === 'where' && is_a($key, \Closure::class)) {
             $this->filters[] = $key;
@@ -57,7 +66,8 @@ class RequestFiltersHandler implements RequestFiltersContract
             'field_type' => $fieldType,
             'value' => $value,
             'operator' => $operator,
-            'method' => $method
+            'method' => $method,
+            'is_or' => $isOr
         ];
 
         return $this;
@@ -78,17 +88,17 @@ class RequestFiltersHandler implements RequestFiltersContract
 
             if (isset($filter['field_type']) && $filter['field_type'] === 'json') {
                 /** @var Builder $builder */
-                $builder = $builder->where(function (Builder $builder) use ($filter) {
+                $builder = $builder->{$this->getConditionMethod('where', $filter['is_or'])}(function (Builder $builder) use ($filter) {
                     if (is_array($filter['value'])) {
-                        $builder->whereJsonContains($filter['key'], $filter['value'][0]);
+                        $builder->{$this->getConditionMethod('whereJsonContains', $filter['is_or'])}($filter['key'], $filter['value'][0]);
                         foreach ($filter['value'] as $index => $value) {
                             if ($index === 0) {
                                 continue;
                             }
-                            $builder->orWhereJsonContains($filter['key'], $value);
+                            $builder->{$this->getConditionMethod('orWhereJsonContains', $filter['is_or'])}($filter['key'], $value);
                         }
                     } else {
-                        $builder->whereJsonContains($filter['key'], $filter['value']);
+                        $builder->{$this->getConditionMethod('whereJsonContains', $filter['is_or'])}($filter['key'], $filter['value']);
                     }
                 });
                 continue;
@@ -96,13 +106,23 @@ class RequestFiltersHandler implements RequestFiltersContract
             if ($filter['method'] === 'whereNotIn') {
                 $builder = $builder->{$filter['method']}($filter['key'], $filter['value']);
             } else if (is_array($filter['value'])) {
-                $builder = $builder->whereIn($filter['key'], $filter['value']);
+                $builder = $builder->{$this->getConditionMethod('whereIn', $filter['is_or'])}($filter['key'], $filter['value']);
             } else {
-                $builder = $builder->{$filter['method']}($filter['key'], $filter['operator'], $filter['value']);
+                $builder = $builder->{$this->getConditionMethod($filter['method'], $filter['is_or'])}($filter['key'], $filter['operator'], $filter['value']);
             }
         }
 
         return $builder;
+    }
+
+    private function getConditionMethod(string $method, bool $isOr = false): string
+    {
+        if (!$isOr) {
+            return $method;
+        } else if (preg_match('/^or/', $method)) {
+            return $method;
+        }
+        return Str::camel('or_'.$method);
     }
 
     /**
