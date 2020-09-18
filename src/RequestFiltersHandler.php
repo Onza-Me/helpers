@@ -29,18 +29,18 @@ class RequestFiltersHandler implements RequestFiltersContract
                     $filter['key'],
                     $filter['value'],
                     $filter['operator'] ?? '=',
-                    $filter['method'] ?? null,
+                    $filter['method'] ?? 'where',
                     null,
-                    $filter['is_or'] ?? null,
+                    $filter['is_or'] ?? false,
                 );
             } else {
                 $this->addFilter(
                     $key,
                     $filter['value'],
                     $filter['operator'] ?? '=',
-                    $filter['method'] ?? null,
+                    $filter['method'] ?? 'where',
                     null,
-                    $filter['is_or'] ?? null,
+                    $filter['is_or'] ?? false,
                 );
             }
         }
@@ -55,7 +55,7 @@ class RequestFiltersHandler implements RequestFiltersContract
      * @param bool $isOr
      * @return $this|mixed
      */
-    public function addFilter($key, $value = null, string $operator = '=', string $method = 'where', string $fieldType = null, bool $isOr = false)
+    public function addFilter($key, $value = null, string $operator = '=', string $method = 'where', $fieldType = null, bool $isOr = false)
     {
         if ($method === 'where' && is_a($key, \Closure::class)) {
             $this->filters[] = $key;
