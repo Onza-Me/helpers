@@ -79,40 +79,70 @@ class RequestFiltersHandler implements RequestFiltersContract
      */
     public function apply($builder)
     {
-
         foreach ($this->filters as $filter) {
             if (is_callable($filter)) {
                 $builder = $filter($builder);
                 continue;
             }
 
-            if (isset($filter['field_type']) && $filter['field_type'] === 'json') {
-                /** @var Builder $builder */
-                $builder = $builder->{$this->getConditionMethod('where', $filter['is_or'])}(function (Builder $builder) use ($filter) {
-                    if (is_array($filter['value'])) {
-                        $builder->{$this->getConditionMethod('whereJsonContains', $filter['is_or'])}($filter['key'], $filter['value'][0]);
-                        foreach ($filter['value'] as $index => $value) {
-                            if ($index === 0) {
-                                continue;
-                            }
-                            $builder->{$this->getConditionMethod('orWhereJsonContains', $filter['is_or'])}($filter['key'], $value);
-                        }
-                    } else {
-                        $builder->{$this->getConditionMethod('whereJsonContains', $filter['is_or'])}($filter['key'], $filter['value']);
-                    }
+            $filter = $this->prepareRelationInFilterArray($filter);
+
+            if (!empty($filter['relation'])) {
+                $builder = $builder->whereHas($filter['relation'], function (Builder $builder) use ($filter) {
+                    $this->applyFilter($builder, $filter);
                 });
-                continue;
-            }
-            if ($filter['method'] === 'whereNotIn') {
-                $builder = $builder->{$filter['method']}($filter['key'], $filter['value']);
-            } else if (is_array($filter['value'])) {
-                $builder = $builder->{$this->getConditionMethod('whereIn', $filter['is_or'])}($filter['key'], $filter['value']);
             } else {
-                $builder = $builder->{$this->getConditionMethod($filter['method'], $filter['is_or'])}($filter['key'], $filter['operator'], $filter['value']);
+                $builder = $this->applyFilter($builder, $filter);
             }
         }
 
         return $builder;
+    }
+
+    private function prepareRelationInFilterArray(array $filter): array
+    {
+        $explodedKey = explode('.', $filter['key']);
+
+        $key = $filter['key'];
+        $relation = '';
+
+        if (count($explodedKey) > 1) {
+            $relation = $explodedKey[0] ?? $relation;
+            $key = $explodedKey[1];
+        }
+
+        $filter['key'] = $key;
+        $filter['relation'] = $relation;
+
+        return $filter;
+    }
+
+    private function applyFilter(Builder &$builder, array $filter)
+    {
+        if (isset($filter['field_type']) && $filter['field_type'] === 'json') {
+            /** @var Builder $builder */
+            $builder = $builder->{$this->getConditionMethod('where', $filter['is_or'])}(function (Builder $builder) use ($filter) {
+                if (is_array($filter['value'])) {
+                    $builder->{$this->getConditionMethod('whereJsonContains', $filter['is_or'])}($filter['key'], $filter['value'][0]);
+                    foreach ($filter['value'] as $index => $value) {
+                        if ($index === 0) {
+                            continue;
+                        }
+                        $builder->{$this->getConditionMethod('orWhereJsonContains', $filter['is_or'])}($filter['key'], $value);
+                    }
+                } else {
+                    return $builder->{$this->getConditionMethod('whereJsonContains', $filter['is_or'])}($filter['key'], $filter['value']);
+                }
+            });
+            return $builder;
+        }
+        if ($filter['method'] === 'whereNotIn') {
+            return $builder->{$filter['method']}($filter['key'], $filter['value']);
+        } else if (is_array($filter['value'])) {
+            return $builder->{$this->getConditionMethod('whereIn', $filter['is_or'])}($filter['key'], $filter['value']);
+        } else {
+            return $builder->{$this->getConditionMethod($filter['method'], $filter['is_or'])}($filter['key'], $filter['operator'], $filter['value']);
+        }
     }
 
     private function getConditionMethod(string $method, bool $isOr = false): string
