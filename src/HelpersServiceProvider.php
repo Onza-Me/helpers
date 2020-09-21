@@ -22,6 +22,6 @@ class HelpersServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadTranslationsFrom('../resources/lang', 'ru');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'ru');
     }
 }
