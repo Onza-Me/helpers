@@ -34,3 +34,27 @@ if (!function_exists('get_converted_json_from_request')) {
         }
     }
 }
+
+if (!function_exists('is_boolean_var')) {
+    function is_boolean_var ($var): bool
+    {
+        if (is_bool($var) || in_array($var, ['true', 'false'])) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('parse_boolean_var')) {
+    function parse_boolean_var ($var): bool
+    {
+        if (is_bool($var)) {
+            return $var;
+        }
+        if (in_array($var, ['true', 'false'])) {
+            return json_decode($var);
+        }
+        return false;
+    }
+}

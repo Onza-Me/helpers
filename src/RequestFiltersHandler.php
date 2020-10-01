@@ -88,7 +88,7 @@ class RequestFiltersHandler implements RequestFiltersContract
             $filter = $this->prepareRelationInFilterArray($filter);
 
             if (!empty($filter['relation'])) {
-                $builder = $builder->whereHas($filter['relation'], function (Builder $builder) use ($filter) {
+                $builder = $builder->{ (isset($filter['is_or']) && parse_boolean_var($filter['is_or']) ? 'orW' : 'w').'hereHas' }($filter['relation'], function (Builder $builder) use ($filter) {
                     $this->applyFilter($builder, $filter);
                 });
             } else {
