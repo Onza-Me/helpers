@@ -99,7 +99,7 @@ class RequestFiltersHandler implements RequestFiltersContract
         return $builder;
     }
 
-    private function prepareRelationInFilterArray(array $filter): array
+    protected function prepareRelationInFilterArray(array $filter): array
     {
         $explodedKey = explode('.', $filter['key']);
 
@@ -117,7 +117,7 @@ class RequestFiltersHandler implements RequestFiltersContract
         return $filter;
     }
 
-    private function applyFilter(Builder &$builder, array $filter)
+    protected function applyFilter(Builder &$builder, array $filter)
     {
         if (isset($filter['field_type']) && $filter['field_type'] === 'json') {
             /** @var Builder $builder */
@@ -145,7 +145,7 @@ class RequestFiltersHandler implements RequestFiltersContract
         }
     }
 
-    private function getConditionMethod(string $method, bool $isOr = false): string
+    protected function getConditionMethod(string $method, bool $isOr = false): string
     {
         if (!$isOr) {
             return $method;
