@@ -2,11 +2,14 @@
 
 namespace OnzaMe\Helpers\Http\Responses;
 
+use OnzaMe\Helpers\Http\Resources\ResponseResource;
+use OnzaMe\Helpers\Models\ResponseModel;
+
 class ErrorResponse extends \Illuminate\Http\JsonResponse
 {
     public function __construct(string $title, string $description, array $fields = [], int $status = 422)
     {
-        $data = [
+        $responseModel = ResponseModel::make([
             'error' => [
                 'message' => [
                     'title' => $title,
@@ -14,9 +17,10 @@ class ErrorResponse extends \Illuminate\Http\JsonResponse
                 ]
             ],
             'fields' => $fields
-        ];
+        ]);
 
-        parent::__construct($data, $status);
+
+        parent::__construct(ResponseResource::make($responseModel), $status);
     }
 
     public function addField($key, $value)

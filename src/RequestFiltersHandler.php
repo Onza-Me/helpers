@@ -86,17 +86,29 @@ class RequestFiltersHandler implements RequestFiltersContract
             }
 
             $filter = $this->prepareRelationInFilterArray($filter);
-
             if (!empty($filter['relation'])) {
-                $builder = $builder->{ (isset($filter['is_or']) && parse_boolean_var($filter['is_or']) ? 'orW' : 'w').'hereHas' }($filter['relation'], function (Builder $builder) use ($filter) {
-                    $this->applyFilter($builder, $filter);
-                });
+                $builder = $this->applyFilterWithRelation($builder, $filter);
             } else {
                 $builder = $this->applyFilter($builder, $filter);
             }
         }
 
         return $builder;
+    }
+
+    private function applyFilterWithRelation(Builder $builder, array $filter): Builder
+    {
+        return $builder->{ $this->getQueryFilterRelationMethodName($filter) }(
+            $filter['relation'],
+            function (Builder $builder) use ($filter) {
+                $this->applyFilter($builder, $filter);
+            }
+        );
+    }
+
+    private function getQueryFilterRelationMethodName(array $filter): string
+    {
+        return (isset($filter['is_or']) && parse_boolean_var($filter['is_or']) ? 'orW' : 'w').'hereHas';
     }
 
     protected function prepareRelationInFilterArray(array $filter): array

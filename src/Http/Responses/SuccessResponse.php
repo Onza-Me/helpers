@@ -2,19 +2,25 @@
 
 namespace OnzaMe\Helpers\Http\Responses;
 
-class SuccessResponse extends \Illuminate\Http\JsonResponse
+use Illuminate\Http\JsonResponse;
+use OnzaMe\Helpers\Http\Resources\ResponseResource;
+use OnzaMe\Helpers\Models\ResponseModel;
+
+class SuccessResponse extends JsonResponse
 {
-    public function __construct(string $title, string $description, int $status = 200)
+    public function __construct(string $title, string $description, int $status = 200, $data = null)
     {
-        $data = [
+        $responseModel = ResponseModel::make([
             'success' => [
                 'message' => [
                     'title' => $title,
                     'description' => $description
                 ]
-            ]
-        ];
+            ],
+            'data' => $data
+        ]);
 
-        parent::__construct($data, $status);
+
+        parent::__construct(ResponseResource::make($responseModel), $status);
     }
 }
