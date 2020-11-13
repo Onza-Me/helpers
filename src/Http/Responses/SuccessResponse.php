@@ -23,4 +23,9 @@ class SuccessResponse extends JsonResponse
 
         parent::__construct(ResponseResource::make($responseModel), $status);
     }
+
+    public static function make(string $title, string $description, int $status = 200, $data = null)
+    {
+        return new self($title, $description, $status, $data);
+    }
 }
