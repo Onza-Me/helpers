@@ -24,7 +24,7 @@ class ErrorResponse extends JsonResponse
         parent::__construct(ResponseResource::make($responseModel), $status);
     }
 
-    public static function make(string $title, string $description, array $fields = [], int $status = 422)
+    public static function make(string $title, string $description, array $fields = [], int $status = 422): ErrorResponse
     {
         return new self($title, $description, $fields, $status);
     }

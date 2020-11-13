@@ -20,11 +20,10 @@ class SuccessResponse extends JsonResponse
             'data' => $data
         ]);
 
-
         parent::__construct(ResponseResource::make($responseModel), $status);
     }
 
-    public static function make(string $title, string $description, int $status = 200, $data = null)
+    public static function make(string $title, string $description, int $status = 200, $data = null): SuccessResponse
     {
         return new self($title, $description, $status, $data);
     }
