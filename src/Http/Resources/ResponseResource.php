@@ -2,9 +2,7 @@
 
 namespace OnzaMe\Helpers\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-
-class ResponseResource extends JsonResource
+class ResponseResource extends BaseJsonResource
 {
     /**
      * Transform the resource into an array.
@@ -20,10 +18,5 @@ class ResponseResource extends JsonResource
             $this->mergeWhenNotNull('error'),
             $this->mergeWhenNotNull('fields')
         ];
-    }
-
-    protected function mergeWhenNotNull(string $fieldName)
-    {
-        return $this->mergeWhen(!is_null($this->{$fieldName}), [$fieldName => $this->{$fieldName}]);
     }
 }
