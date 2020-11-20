@@ -79,19 +79,21 @@ class RequestFiltersHandler implements RequestFiltersContract
      */
     public function apply($builder)
     {
-        foreach ($this->filters as $filter) {
-            if (is_callable($filter)) {
-                $builder = $filter($builder);
-                continue;
-            }
+        $builder = $builder->where(function (Builder $builder) {
+            foreach ($this->filters as $filter) {
+                if (is_callable($filter)) {
+                    $builder = $filter($builder);
+                    continue;
+                }
 
-            $filter = $this->prepareRelationInFilterArray($filter);
-            if (!empty($filter['relation'])) {
-                $builder = $this->applyFilterWithRelation($builder, $filter);
-            } else {
-                $builder = $this->applyFilter($builder, $filter);
+                $filter = $this->prepareRelationInFilterArray($filter);
+                if (!empty($filter['relation'])) {
+                    $builder = $this->applyFilterWithRelation($builder, $filter);
+                } else {
+                    $builder = $this->applyFilter($builder, $filter);
+                }
             }
-        }
+        });
 
         return $builder;
     }
