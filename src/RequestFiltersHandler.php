@@ -86,6 +86,10 @@ class RequestFiltersHandler implements RequestFiltersContract
                     continue;
                 }
 
+                if ($filter['operator'] === 'ilike' && $filter['value'] === '%%') {
+                    continue;
+                }
+
                 $filter = $this->prepareRelationInFilterArray($filter);
                 if (!empty($filter['relation'])) {
                     $builder = $this->applyFilterWithRelation($builder, $filter);
