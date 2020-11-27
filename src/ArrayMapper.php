@@ -31,7 +31,7 @@ class ArrayMapper
         if (preg_match('/\|/', $way)) {
             $items = explode('|', $way);
             foreach ($items as $item) {
-                if (is_null($value = $this->get($item, $delimiter, $default))) {
+                if (is_null($value = $this->get($item, $default, $delimiter))) {
                     continue;
                 }
                 return $value;
