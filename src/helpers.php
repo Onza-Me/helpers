@@ -36,7 +36,10 @@ if (!function_exists('is_json')) {
     function is_json (string $json): bool
     {
         try {
-            json_decode($json);
+            $result = json_decode($json);
+            if (is_null($result) && $json !== 'null') {
+                return false;
+            }
             return true;
         } catch (\Exception $e) {
             return false;
