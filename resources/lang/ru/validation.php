@@ -141,6 +141,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'email' => [
+            'unique' => 'Данный email уже зарегистрирован'
+        ]
     ],
 
     /*
