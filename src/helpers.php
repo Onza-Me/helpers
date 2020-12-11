@@ -1,4 +1,29 @@
 <?php
+use Illuminate\Support\Facades\Storage;
+
+if (!function_exists('remove_disk_prefix_path')) {
+    function remove_disk_prefix_path(string $absolutePath, string $disk = 'public'): string
+    {
+        return str_replace(Storage::disk($disk)->getDriver()->getAdapter()->getPathPrefix(), '', $absolutePath);
+    }
+}
+
+if (!function_exists('unset_if_exists')) {
+    function unset_if_exists(array &$array, $key)
+    {
+        if (is_array($key)) {
+            foreach ($key as $value) {
+                unset_if_exists($array, $value);
+            }
+            return;
+        }
+
+        if (!isset($array[$key])) {
+            return;
+        }
+        unset($array[$key]);
+    }
+}
 
 if (!function_exists('array_mapper')) {
     function array_mapper (array $array)
@@ -11,7 +36,10 @@ if (!function_exists('is_json')) {
     function is_json (string $json): bool
     {
         try {
-            json_decode($json);
+            $result = json_decode($json);
+            if (is_null($result) && $json !== 'null') {
+                return false;
+            }
             return true;
         } catch (\Exception $e) {
             return false;
