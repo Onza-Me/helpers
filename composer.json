@@ -20,7 +20,7 @@
         "ext-json": "*",
         "illuminate/support": "^7.0|^8.0",
         "onza-me/backend_jwt": "dev-master",
-        "sentry/sentry-laravel": "^1.9"
+        "sentry/sentry-laravel": "^2.3.1"
     },
     "require-dev": {
         "orchestra/testbench": "^5.0",
