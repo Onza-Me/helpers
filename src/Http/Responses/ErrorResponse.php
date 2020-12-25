@@ -19,8 +19,6 @@ class ErrorResponse extends JsonResponse
                 'fields' => $fields
             ]
         ]);
-
-
         parent::__construct(ResponseResource::make($responseModel), $status);
     }
 
