@@ -31,14 +31,14 @@ class ErrorResponse extends JsonResponse
     {
         $data = $this->getData(true);
 
-        if (!isset($data['fields'])) {
-            $data['fields'] = [];
+        if (!isset($data['error']['fields'])) {
+            $data['error']['fields'] = [];
         }
-        if (!isset($data['fields'][$key])) {
-            $data['fields'][$key] = [];
+        if (!isset($data['error']['fields'][$key])) {
+            $data['error']['fields'][$key] = [];
         }
 
-        $data['fields'][$key][] = $value;
+        $data['error']['fields'][$key][] = $value;
 
         $this->setData($data);
     }
@@ -47,6 +47,6 @@ class ErrorResponse extends JsonResponse
     {
         $data = $this->getData(true);
 
-        return count($data['fields']);
+        return count($data['error']['fields']);
     }
 }
