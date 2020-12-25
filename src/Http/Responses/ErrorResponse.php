@@ -15,9 +15,9 @@ class ErrorResponse extends JsonResponse
                 'message' => [
                     'title' => $title,
                     'description' => $description
-                ]
-            ],
-            'fields' => $fields
+                ],
+                'fields' => $fields
+            ]
         ]);
 
 
