@@ -2,10 +2,10 @@
 
 namespace OnzaMe\Helpers\Http\Requests;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use OnzaMe\Helpers\Exceptions\PermissionDeniedException;
 
 class BasicRequest extends FormRequest

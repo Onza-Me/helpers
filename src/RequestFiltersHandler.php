@@ -154,6 +154,12 @@ class RequestFiltersHandler implements RequestFiltersContract
             });
             return $builder;
         }
+        if ($filter['operator'] === '!=' && $filter['value'] === null) {
+            return $builder->{$this->getConditionMethod('whereNotNull', $filter['is_or'])}($filter['key']);
+        }
+        if ($filter['operator'] === '=' && $filter['value'] === null) {
+            return $builder->{$this->getConditionMethod('whereNull', $filter['is_or'])}($filter['key']);
+        }
         if ($filter['method'] === 'whereNotIn') {
             return $builder->{$filter['method']}($filter['key'], $filter['value']);
         } else if (is_array($filter['value'])) {
