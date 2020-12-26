@@ -15,8 +15,7 @@ class ResponseResource extends BaseJsonResource
         return [
             $this->mergeWhenNotNull('success'),
             $this->mergeWhenNotNull('data'),
-            $this->mergeWhenNotNull('error'),
-            $this->mergeWhenNotNull('fields')
+            $this->mergeWhenNotNull('error')
         ];
     }
 }
