@@ -33,8 +33,11 @@ if (!function_exists('array_mapper')) {
 }
 
 if (!function_exists('is_json')) {
-    function is_json (string $json): bool
+    function is_json ($json = null): bool
     {
+        if (!is_string($json)) {
+            return false;
+        }
         try {
             $result = json_decode($json);
             if (is_null($result) && $json !== 'null') {
