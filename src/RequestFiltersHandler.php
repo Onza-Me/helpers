@@ -64,7 +64,7 @@ class RequestFiltersHandler implements RequestFiltersContract
         $this->filters[] = [
             'key' => $key,
             'field_type' => $fieldType,
-            'value' => $value,
+            'value' => is_json($value) && is_array($decodedValue = json_decode($value, true)) ? $decodedValue : $value,
             'operator' => $operator,
             'method' => $method,
             'is_or' => $isOr
