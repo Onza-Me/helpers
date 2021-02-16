@@ -25,6 +25,25 @@ if (!function_exists('unset_if_exists')) {
     }
 }
 
+if (!function_exists('extract_if_exists')) {
+    function extract_if_exists(array &$array, $key)
+    {
+        if (is_array($key)) {
+            $results = [];
+            foreach ($key as $item) {
+                $results[$item] = extract_if_exists($array, $item);
+            }
+            return $results;
+        }
+        if (!isset($array[$key])) {
+            return null;
+        }
+        $result = $array[$key];
+        unset($array[$key]);
+        return $result;
+    }
+}
+
 if (!function_exists('array_mapper')) {
     function array_mapper (array $array)
     {
