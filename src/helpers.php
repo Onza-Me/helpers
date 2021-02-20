@@ -26,7 +26,7 @@ if (!function_exists('unset_if_exists')) {
 }
 
 if (!function_exists('extract_if_exists')) {
-    function extract_if_exists(array &$array, $key)
+    function extract_if_exists(array &$array, $key, $default = null)
     {
         if (is_array($key)) {
             $results = [];
@@ -36,7 +36,7 @@ if (!function_exists('extract_if_exists')) {
             return $results;
         }
         if (!isset($array[$key])) {
-            return null;
+            return $default;
         }
         $result = $array[$key];
         unset($array[$key]);
