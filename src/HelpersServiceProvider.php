@@ -25,5 +25,9 @@ class HelpersServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'ru');
+
+        $this->publishes([
+            __DIR__ . '/../config/config.php' => config_path('onzame_helpers.php'),
+        ], 'config');
     }
 }
