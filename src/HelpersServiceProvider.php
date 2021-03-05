@@ -3,6 +3,8 @@
 namespace OnzaMe\Helpers;
 
 use Illuminate\Support\ServiceProvider;
+use OnzaMe\Helpers\Services\Contracts\RequestBetweenServicesServiceContract;
+use OnzaMe\Helpers\Services\RequestBetweenServicesService;
 
 class HelpersServiceProvider extends ServiceProvider
 {
@@ -29,5 +31,7 @@ class HelpersServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/config.php' => config_path('onzame_helpers.php'),
         ], 'config');
+
+        $this->app->bind(RequestBetweenServicesServiceContract::class, RequestBetweenServicesService::class);
     }
 }
