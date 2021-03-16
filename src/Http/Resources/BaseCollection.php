@@ -26,8 +26,8 @@ class BaseCollection extends ResourceCollection
         try {
             return [
                 "total" => $paginate->total(),
-                "per_page" => $paginate->perPage(),
                 "next_page" => $paginate->currentPage() + 1 <= $paginate->lastPage() ? $paginate->currentPage() + 1 : null,
+                "per_page" => $paginate->perPage(),
                 "first_page_url" => $paginate->url(1),
                 "last_page_url" => $paginate->url($paginate->lastPage()),
                 "next_page_url" => $paginate->nextPageUrl(),
