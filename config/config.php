@@ -3,5 +3,13 @@
 return [
     'services' => [
 
+    ],
+    'headers' => [
+        'change' => [
+
+        ],
+        'remove' => [
+
+        ]
     ]
 ];
