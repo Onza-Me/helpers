@@ -1,5 +1,9 @@
 # OnzaMe/Helper package
 
+## Publish configurations
+
+    php artisan vendor:publish --provider="OnzaMe\Helpers\HelpersServiceProvider"
+
 ## Sentry initialization
 
     php artisan vendor:publish --provider="Sentry\Laravel\ServiceProvider"
