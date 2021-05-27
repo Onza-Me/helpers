@@ -3,6 +3,7 @@
 namespace OnzaMe\Helpers;
 
 use Illuminate\Support\ServiceProvider;
+use OnzaMe\Helpers\Commands\ClearLogCommand;
 use OnzaMe\Helpers\Services\Contracts\RequestBetweenServicesServiceContract;
 use OnzaMe\Helpers\Services\RequestBetweenServicesService;
 
@@ -31,6 +32,12 @@ class HelpersServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/config.php' => config_path('onzame_helpers.php'),
         ], 'config');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ClearLogCommand::class
+            ]);
+        }
 
         $this->app->bind(RequestBetweenServicesServiceContract::class, RequestBetweenServicesService::class);
     }
