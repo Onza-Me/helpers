@@ -2,6 +2,8 @@
 
 namespace OnzaMe\Helpers\Exceptions;
 
+use OnzaMe\Helpers\Http\Responses\ErrorResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -64,6 +66,10 @@ class Handler extends ExceptionHandler
         if (is_a($exception, HttpRequestException::class)) {
             /** @var $exception */
             return $exception->getResponse();
+        }
+        /** @var HttpException $exception */
+        if (is_a($exception, HttpException::class)) {
+            return ErrorResponse::make('Ошибка', $exception->getMessage(), [], $exception->getStatusCode());
         }
 
         return parent::render($request, $exception);
