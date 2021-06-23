@@ -108,3 +108,14 @@ if (!function_exists('parse_boolean_var')) {
         return false;
     }
 }
+
+
+if (!function_exists('file_url')) {
+    function file_url(string $path)
+    {
+        $cdn = config('app.files.cdn');
+        $prefixUrl = !empty($cdn) ? $cdn : config('app.url');
+
+        return rtrim($prefixUrl, '/').'/'.ltrim($path, '/');
+    }
+}
