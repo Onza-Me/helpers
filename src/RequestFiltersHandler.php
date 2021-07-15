@@ -161,7 +161,8 @@ class RequestFiltersHandler implements RequestFiltersContract
     {
         $cols = $this->getModelColumns($builder);
         $col = collect($cols)->where('column_name', $columnKey)->first();
-        return $col['udt_name'] ?? null;
+
+        return is_object($col) ? $col->udt_name ?? null : $col['udt_name'] ?? null;
     }
 
     protected function getFreshModelColumns(Builder $builder)
