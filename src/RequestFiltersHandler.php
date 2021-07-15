@@ -2,6 +2,8 @@
 
 namespace OnzaMe\Helpers;
 
+use DB;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -12,6 +14,7 @@ class RequestFiltersHandler implements RequestFiltersContract
 {
     protected Request $request;
     protected array $filters = [];
+    protected array $cols = [];
 
     public function __construct(Request $request)
     {
@@ -30,7 +33,7 @@ class RequestFiltersHandler implements RequestFiltersContract
                     $filter['value'],
                     $filter['operator'] ?? '=',
                     $filter['method'] ?? 'where',
-                    null,
+                    $filter['field_type'] ?? null,
                     $filter['is_or'] ?? false,
                 );
             } else {
@@ -39,7 +42,7 @@ class RequestFiltersHandler implements RequestFiltersContract
                     $filter['value'],
                     $filter['operator'] ?? '=',
                     $filter['method'] ?? 'where',
-                    null,
+                    $filter['field_type'] ?? null,
                     $filter['is_or'] ?? false,
                 );
             }
@@ -135,8 +138,44 @@ class RequestFiltersHandler implements RequestFiltersContract
         return $filter;
     }
 
+    protected function getModelColumnsCacheKey(Builder $builder): string
+    {
+        return 'table.'.$builder->getModel()->getTable().'.columns';
+    }
+
+    protected function getModelColumns(Builder $builder)
+    {
+        if (!empty($this->cols)) {
+            return $this->cols;
+        }
+
+        $cols = json_decode(\Cache::get($this->getModelColumnsCacheKey($builder), '[]'), true);
+        if (!empty($cols)) {
+            return $this->cols = $cols;
+        }
+
+        return $this->getFreshModelColumns($builder);
+    }
+
+    protected function getModelColumnType(Builder $builder, string $columnKey)
+    {
+        $cols = $this->getModelColumns($builder);
+        $col = collect($cols)->where('column_name', $columnKey)->first();
+        return $col['udt_name'] ?? null;
+    }
+
+    protected function getFreshModelColumns(Builder $builder)
+    {
+        $result = \DB::select(
+            'select column_name, udt_name from information_schema.columns where table_name = \''.$builder->getModel()->getTable().'\';'
+        );
+        Cache::add($this->getModelColumnsCacheKey($builder), json_encode($result), 604800);
+        return $this->cols = $result;
+    }
+
     protected function applyFilter(Builder &$builder, array $filter)
     {
+        $filter['field_type'] = !empty($filter['field_type']) ? $filter['field_type'] : $this->getModelColumnType($builder, $filter['key']);
         if (isset($filter['field_type']) && $filter['field_type'] === 'json') {
             /** @var Builder $builder */
             $builder = $builder->{$this->getConditionMethod('where', $filter['is_or'])}(function (Builder $builder) use ($filter) {
@@ -198,7 +237,7 @@ class RequestFiltersHandler implements RequestFiltersContract
             ]);
         }
 
-        $page = $this->request->get('page') ?? $page;
+        $page = $this->request->get($pageName) ?? $page;
 
         $requestOrderHandler = new RequestOrderHandler($this->request);
 
