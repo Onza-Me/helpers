@@ -41,7 +41,6 @@ class ArrayMapper
 
         $wayArray = explode($delimiter, $way);
         $result = null;
-        $tmp = null;
 
         foreach ($wayArray as $key) {
             if (!empty($result)) {

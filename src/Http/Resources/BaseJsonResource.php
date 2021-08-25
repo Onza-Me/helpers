@@ -19,4 +19,13 @@ class BaseJsonResource extends JsonResource
         }
         return $this->merge($defaultColumnValues);
     }
+
+    protected function mergeColumns(array $columns, array $defaultColumns = ['id', 'created_at', 'updated_at'], bool $whenNotNull = true)
+    {
+        $columnValues = [];
+        foreach (array_merge($columns, $defaultColumns) as $columnName) {
+            $columnValues[] = $whenNotNull ? $this->mergeWhenNotNull($columnName) : $this->merge([$columnName => $this->{$columnName}]);
+        }
+        return $this->merge($columnValues);
+    }
 }
