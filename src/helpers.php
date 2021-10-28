@@ -119,3 +119,20 @@ if (!function_exists('file_url')) {
         return rtrim($prefixUrl, '/').'/'.ltrim($path, '/');
     }
 }
+
+if (!function_exists('load_class_names_from_dir')) {
+    function load_class_names_from_dir(string $dir): array
+    {
+        $files = scandir($dir);
+        if (!$files) {
+            return [];
+        }
+        return array_filter(array_map(function ($filename) use ($dir) {
+            $extension = '.php';
+            if (in_array($filename, ['.', '..']) || !str_contains($filename, $extension)) {
+                return null;
+            }
+            return str_replace($extension, '', $filename);
+        }, $files));
+    }
+}
